@@ -1,4 +1,4 @@
-#include "RRT.h"
+#include "MyRRT.h"
 
 double GETDISTANCE(vector<double>& n1, vector<double>& n2){
     double result = 0;
@@ -9,11 +9,11 @@ double GETDISTANCE(vector<double>& n1, vector<double>& n2){
     return result;
 }
 
-void RRT::set_epsilon(int val){
+void MyRRT::set_epsilon(int val){
     epsilon = val;
 }
 
-vector<double> RRT::samplePts(){
+vector<double> MyRRT::samplePts(){
     /*
     Return:
         New sampled node point.
@@ -32,7 +32,7 @@ vector<double> RRT::samplePts(){
     return pts;
 }
 
-vector<double> RRT::getNearest(vector<double>& n1, int& nearest){
+vector<double> MyRRT::getNearest(vector<double>& n1, int& nearest){
     /*
     Args:
         n1: New nodes that needs to find the nearest node in the RRT.
@@ -54,7 +54,7 @@ vector<double> RRT::getNearest(vector<double>& n1, int& nearest){
     return result;
 }
 
-vector<double> RRT::getSampled(vector<double>& n1, vector<double>& n2){
+vector<double> MyRRT::getSampled(vector<double>& n1, vector<double>& n2){
     /*
     Args:
         n1: Sampled node.
@@ -71,7 +71,7 @@ vector<double> RRT::getSampled(vector<double>& n1, vector<double>& n2){
     return result;
 }
 
-bool RRT::checkCollision(vector<double>& n1, vector<double>& n2){
+bool MyRRT::checkCollision(vector<double>& n1, vector<double>& n2){
     /*
     Args:
         n1: Node to be sampled.
@@ -97,7 +97,7 @@ bool RRT::checkCollision(vector<double>& n1, vector<double>& n2){
     return false;
 }
 
-void RRT::planning(double*** plan, int& numofsamples){
+void MyRRT::planning(double*** plan, int& numofsamples){
     
     bool terminate = false;
     double threshold = 1;

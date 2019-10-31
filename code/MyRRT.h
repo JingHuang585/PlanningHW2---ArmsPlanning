@@ -17,7 +17,7 @@ class Node{
 };
 
 
-class RRT{
+class MyRRT{
     private:
     double* RRTMap;        // Map.
     int dim;               // Dimension of the configuration space.
@@ -33,7 +33,7 @@ class RRT{
     public:
     vector<vector<double>> RRTNode;  // Contains every node of the RRT. ID: i ==> Node: RRTNode[i].
     vector<vector<double>> path;     // Contains every node of the planned path.
-    RRT(int DOF, vector<double>& s, vector<double>& g, double* map, int Xsize, int Ysize){ 
+    MyRRT(int DOF, vector<double>& s, vector<double>& g, double* map, int Xsize, int Ysize){ 
         dim = DOF; 
         start = s;
         goal = g;

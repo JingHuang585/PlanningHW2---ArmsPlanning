@@ -4,6 +4,7 @@
  *
  *=================================================================*/
 #include "planner.h"
+#include "MyRRT.h"
 #include "mex.h"
 
 static void planner(
@@ -55,7 +56,8 @@ static void planner(
         start[i] = armstart_anglesV_rad[i];
         goal[i] = armgoal_anglesV_rad[i];
     }
-    RRT myRRT (numofDOFs, start, goal, map, x_size, y_size);
+    MyRRT myRRT (numofDOFs, start, goal, map, x_size, y_size);
+    int numofsamples = 0;
     myRRT.planning(plan, numofsamples);
     *planlength = numofsamples;
 

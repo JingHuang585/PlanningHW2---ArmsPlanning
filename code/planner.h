@@ -1,5 +1,4 @@
-#include <math.h>
-#include "RRT.h"
+#include "math.h"
 
 /* Input Arguments */
 #define	MAP_IN      prhs[0]
