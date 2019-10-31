@@ -8,14 +8,6 @@
 
 using namespace std;
 
-/*
-Node class is the tree node of RRT, RRT*, RRT connect and PRM.
-*/
-class Node{
-    public:
-    vector<double> states; // Represent location in configuration space.
-};
-
 
 class MyRRT{
     private:
@@ -28,10 +20,10 @@ class MyRRT{
     double epsilon = 1;    // Epsilon initialization.
     vector<double> goal;   // Goal point in C space.
     vector<double> start;  // Start point in C space.
-    unordered_map<int, int> parent; // Stores backtracking information.
+    unordered_map<int, int> parent;  // Stores backtracking information.
+    vector<vector<double>> RRTNode;  // Contains every node of the RRT. ID: i ==> Node: RRTNode[i].
 
     public:
-    vector<vector<double>> RRTNode;  // Contains every node of the RRT. ID: i ==> Node: RRTNode[i].
     vector<vector<double>> path;     // Contains every node of the planned path.
     MyRRT(int DOF, vector<double>& s, vector<double>& g, double* map, int Xsize, int Ysize){ 
         dim = DOF; 

@@ -56,9 +56,10 @@ static void planner(
         start[i] = armstart_anglesV_rad[i];
         goal[i] = armgoal_anglesV_rad[i];
     }
-    MyRRT myRRT (numofDOFs, start, goal, map, x_size, y_size);
-    int numofsamples = 0;
-    myRRT.planning(plan, numofsamples);
+    MyRRT myRRT (numofDOFs, start, goal, map, x_size, y_size);      // Initialize a RRT.
+    myRRT.set_epsilon(2);                                           // Set the epsilon.
+    int numofsamples = 0;                                           // Initialize number of samples.
+    myRRT.planning(plan, numofsamples);                             // Start planning.
     *planlength = numofsamples;
 
     return;

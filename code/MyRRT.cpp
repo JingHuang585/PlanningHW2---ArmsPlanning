@@ -19,14 +19,14 @@ vector<double> MyRRT::samplePts(){
         New sampled node point.
     */
     double p = (double)rand() / RAND_MAX;
-    vector<double> pts;
+    vector<double> pts (dim, 0);
     if (p < 0.1){
         pts = goal;
     }
     else{
         for (int i = 0; i < dim; ++i){
             double val = (double)rand() / RAND_MAX * (2*M_PI);
-            pts.push_back(val);
+            pts[i] = val;
         }
     }
     return pts;
@@ -89,8 +89,8 @@ bool MyRRT::checkCollision(vector<double>& n1, vector<double>& n2){
             angles[j] = n2[j] + dist * i / interpolate_num;
         }
         // Check if there is collision
-        bool temp = IsValidArmConfiguration(angles, dim, RRTMap, x_size, y_size);
-        if (!temp){
+        bool isCollide = IsValidArmConfiguration(angles, dim, RRTMap, x_size, y_size);
+        if (!isCollide){
             return true;
         }
     }
