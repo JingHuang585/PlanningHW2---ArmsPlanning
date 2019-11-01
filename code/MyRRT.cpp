@@ -1,5 +1,6 @@
 #include "MyRRT.h"
 
+
 double GETDISTANCE(vector<double>& n1, vector<double>& n2){
     double result = 0;
     for (int i = 0; i < n1.size(); ++i){
@@ -9,8 +10,16 @@ double GETDISTANCE(vector<double>& n1, vector<double>& n2){
     return result;
 }
 
-void MyRRT::set_epsilon(int val){
+void MyRRT::set_epsilon(double val){
     epsilon = val;
+}
+
+void MyRRT::set_threshold(double val){
+    threshold = val;
+}
+
+void MyRRT::set_maxnum(int val){
+    max_num = val;
 }
 
 vector<double> MyRRT::samplePts(){
@@ -32,7 +41,7 @@ vector<double> MyRRT::samplePts(){
     return pts;
 }
 
-vector<double> MyRRT::getNearest(vector<double>& n1, int& nearest){
+vector<double> MyRRT::getNearest(vector<double>& q_rand, int& nearest){
     /*
     Args:
         n1: New nodes that needs to find the nearest node in the RRT.
@@ -43,50 +52,54 @@ vector<double> MyRRT::getNearest(vector<double>& n1, int& nearest){
     vector<double> result;
     double dist = double(INT_MAX);
     for(int i = 0; i < RRTNode.size(); ++i){
-        double temp_dist = GETDISTANCE(n1, RRTNode[i]);
+        double temp_dist = GETDISTANCE(q_rand, RRTNode[i]);
         if (temp_dist < dist){
             dist = temp_dist;
             nearest = i;
         }
     }
     result = RRTNode[nearest];
-    //parent[RRTNode.size()] = nearest;
     return result;
 }
 
-vector<double> MyRRT::getSampled(vector<double>& n1, vector<double>& n2){
+vector<double> MyRRT::getSampled(vector<double>& q_rand, vector<double>& q_near){
     /*
     Args:
-        n1: Sampled node.
-        n2: Nearest RRT node with regard to n1.
+        q_rand: Sampled node.
+        q_near: Nearest RRT node with regard to n1.
     Return:
         Final node to be sampled that has a distance of epsilon with n2.
     */
-    vector<double> result (n1.size(), 0);
-    double dist = GETDISTANCE(n1, n2);
-    double ratio = epsilon / dist;
-    for (int i = 0; i < n1.size(); ++i){
-        result[i] = n2[i] + (n1[i] - n2[i]) * ratio;
+    vector<double> result (q_rand.size(), 0);
+    double dist = GETDISTANCE(q_rand, q_near);
+    if (dist <= epsilon){
+        result = q_rand;
+    }
+    else{
+        double ratio = epsilon / dist;
+        for (int i = 0; i < q_rand.size(); ++i){
+            result[i] = q_near[i] + (q_rand[i] - q_near[i]) * ratio;
+        }
     }
     return result;
 }
 
-bool MyRRT::checkCollision(vector<double>& n1, vector<double>& n2){
+bool MyRRT::checkCollision(vector<double>& q_samp, vector<double>& q_near){
     /*
     Args:
-        n1: Node to be sampled.
-        n2: Nearest node in the RRT.
+        q_samp: Node to be sampled.
+        q_near: Nearest node in the RRT.
     Return:
-        Boolean indicating whether there will be collision from n2 to n1.
+        Boolean indicating whether there will be collision from q_near to q_samp.
     */
     int interpolate_num = 10;                                // Interpolation number between two nodes.
-    double dist = GETDISTANCE(n1, n2);
+    //double dist = GETDISTANCE(q_samp, q_near);
     for (int i = 1; i <= interpolate_num; ++i){
-        vector<double> temp (n2.size(), 0);
+        vector<double> temp (q_near.size(), 0);
         double* angles;
         angles = (double*) malloc(dim*sizeof(double)); 
-        for (int j = 0; j < n2.size(); ++j){
-            angles[j] = n2[j] + dist * i / interpolate_num;
+        for (int j = 0; j < q_near.size(); ++j){
+            angles[j] = q_near[j] + (q_samp[j] - q_near[j]) * i / interpolate_num;
         }
         // Check if there is collision
         bool isCollide = IsValidArmConfiguration(angles, dim, RRTMap, x_size, y_size);
@@ -98,11 +111,16 @@ bool MyRRT::checkCollision(vector<double>& n1, vector<double>& n2){
 }
 
 void MyRRT::planning(double*** plan, int& numofsamples){
-    
+    /*
+    Args:
+        plan: Planned path. A pointer points to a 2D matrix, which represents the planned path.
+        numofsamples: Number of points along the planned path.
+    */
     bool terminate = false;
-    double threshold = 1;
-    int goalID = -1;
+    int goalID = 0;
+    int count = 0;
     while (!terminate){
+        ++count;
         vector<double> temp_node = samplePts();                               // Sample a new point.
         int nearestID = -1;
         vector<double> nearest_node = getNearest(temp_node, nearestID);       // Get the nearest RRT node of the temporary sampled node.
@@ -115,8 +133,13 @@ void MyRRT::planning(double*** plan, int& numofsamples){
             if (GETDISTANCE(sampled_node, goal) < threshold){
                 // Reach the goal!
                 goalID = num - 1;
+                terminate = true;
                 break;
             }
+        }
+        // Currently don't use count to terminate.
+        if (count >= max_num){
+            terminate = true;
         }
     }
     // Backtrack the goalID to get a path.
