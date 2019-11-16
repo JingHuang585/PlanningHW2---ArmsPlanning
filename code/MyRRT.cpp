@@ -110,6 +110,41 @@ bool MyRRT::checkCollision(vector<double>& q_samp, vector<double>& q_near){
     return false;
 }
 
+vector<double> MyRRT::extend(int& nearestID){
+    /*
+    Args:
+        nearestID: The ID of the nearest node of the q_samp in RRT.
+    Return:
+        sampled_node: Newly sampled RRT node.
+    Extend the RRT and find the nearestID.
+    */
+    vector<double> temp_node = samplePts();                               // Sample a new point.
+    vector<double> nearest_node = getNearest(temp_node, nearestID);       // Get the nearest RRT node of the temporary sampled node.
+    vector<double> sampled_node = getSampled(temp_node, nearest_node);    // Get the sampled RRT node using epsilon.
+    return sampled_node;
+}
+
+bool MyRRT::connect(vector<double>& q_samp, int& nearestID){
+    /*
+    Args:
+        q_samp: Sampled node.
+        nearestID: The ID of the nearest node of the q_samp in RRT.
+    Connect the q_samp into the RRT.
+    */
+    vector<double> nearest_node = RRTNode[nearestID];
+    bool collision = checkCollision(q_samp, nearest_node);
+    if (!collision){
+        RRTNode.push_back(q_samp);
+        ++num;
+        parent[num-1] = nearestID; // New point's ID is: num - 1, parent's ID is: nearestID.
+        return true;
+    }
+    else{
+        return false;
+    }
+    
+}
+
 void MyRRT::planning(double*** plan, int& numofsamples){
     /*
     Args:
@@ -121,15 +156,10 @@ void MyRRT::planning(double*** plan, int& numofsamples){
     int count = 0;
     while (!terminate){
         ++count;
-        vector<double> temp_node = samplePts();                               // Sample a new point.
         int nearestID = -1;
-        vector<double> nearest_node = getNearest(temp_node, nearestID);       // Get the nearest RRT node of the temporary sampled node.
-        vector<double> sampled_node = getSampled(temp_node, nearest_node);    // Get the sampled RRT node using epsilon.
-        bool collision = checkCollision(sampled_node, nearest_node);
-        if (!collision){
-            RRTNode.push_back(sampled_node);
-            ++num;
-            parent[num-1] = nearestID;                                        // New point's ID is: num - 1, parent's ID is: nearestID.
+        vector<double> nearest_node;
+        vector<double> sampled_node = extend(nearestID); // Sample a new node for the RRT and get the nearest node ID.
+        if (connect(sampled_node, nearestID)){          
             if (GETDISTANCE(sampled_node, goal) < threshold){
                 // Reach the goal!
                 goalID = num - 1;

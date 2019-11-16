@@ -30,7 +30,7 @@ class MyRRT{
     vector<vector<double>> RRTNode;  // Contains every node of the RRT. ID: i ==> Node: RRTNode[i].
     vector<vector<double>> path;     // Contains every node of the planned path.
     unordered_map<int, int> parent;  // Stores backtracking information.
-    int num;               // Number of nodes.
+    int num;                         // Number of nodes.
     MyRRT () {}
     MyRRT(int DOF, vector<double>& s, vector<double>& g, double* map, int Xsize, int Ysize){ 
         dim = DOF; 
@@ -49,9 +49,11 @@ class MyRRT{
     void set_threshold(double val);
     void set_maxnum(int val);
     vector<double> samplePts();      // Sample points to the RRT.
-    vector<double> getNearest(vector<double>& n1, int& nearest);       // Get the nearest RRT node of given node.
-    vector<double> getSampled(vector<double>& n1, vector<double>& n2); // Use epsilon to get the final node to be sampled.
-    bool checkCollision(vector<double>& n1, vector<double>& n2);       // Check if there is collision between n1 and n2.
+    vector<double> getNearest(vector<double>& q_rand, int& nearest);       // Get the nearest RRT node of given node.
+    vector<double> getSampled(vector<double>& q_rand, vector<double>& q_near); // Use epsilon to get the final node to be sampled.
+    bool checkCollision(vector<double>& q_samp, vector<double>& q_near);       // Check if there is collision between n1 and n2.
+    vector<double> extend(int& nearestID);
+    bool connect(vector<double>& q_samp, int& nearestID);
     void planning(double*** plan, int& numofsamples);                  // Plan a path from start to goal.
 
 };
