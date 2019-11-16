@@ -20,12 +20,14 @@ class RRT_Connect{
 
     public:
     RRT_Connect() {}
-    RRT_Connect(int DOF, vector<double>& s, vector<double>& g, double* map, int Xsize, int Ysize){
+    RRT_Connect(int DOF, vector<double>& s, vector<double>& g, double* map, int Xsize, int Ysize, double epsilon){
         dim = DOF;
         MyRRT temp_start (DOF, s, g, map, Xsize, Ysize);
         MyRRT temp_goal (DOF, g, s, map, Xsize, Ysize);
         RRT_s = temp_start;
         RRT_g = temp_goal;
+        RRT_s.set_epsilon(epsilon);
+        RRT_g.set_epsilon(epsilon);
         swapped = 0;
     }
     

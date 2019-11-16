@@ -67,13 +67,13 @@ static void planner(
     *planlength = numofsamples;
     // cout << "Number of samples: " << numofsamples << endl;
     */
-
-    RRT_Connect myRRTConnect (numofDOFs, start, goal, map, x_size, y_size);
+    double epsilon = 0.2;
+    RRT_Connect myRRTConnect (numofDOFs, start, goal, map, x_size, y_size, epsilon);
     myRRTConnect.set_maxnum(1000000);
     int numofsamples = 0;
     myRRTConnect.planning(plan, numofsamples);
     *planlength = numofsamples;
-
+    
     return;
 }
 
