@@ -5,6 +5,7 @@
  *=================================================================*/
 // #include "planner.h"
 #include "MyRRT.h"
+#include "RRT_Connect.h"
 
 static void planner(
 		double*	map,
@@ -55,12 +56,22 @@ static void planner(
         start[i] = armstart_anglesV_rad[i];
         goal[i] = armgoal_anglesV_rad[i];
     }
+
+    /*
     MyRRT myRRT (numofDOFs, start, goal, map, x_size, y_size);      // Initialize a RRT.
     myRRT.set_epsilon(0.2);                                         // Set the epsilon.
     myRRT.set_threshold(0.001);                                     // Set the threshold.
     myRRT.set_maxnum(1000000);                                      // Set maximum number of nodes in RRT.
     int numofsamples = 0;                                           // Initialize number of samples.
     myRRT.planning(plan, numofsamples);                             // Start planning.
+    *planlength = numofsamples;
+    // cout << "Number of samples: " << numofsamples << endl;
+    */
+
+    RRT_Connect myRRTConnect (numofDOFs, start, goal, map, x_size, y_size);
+    myRRTConnect.set_maxnum(1000000);
+    int numofsamples = 0;
+    myRRTConnect.planning(plan, numofsamples);
     *planlength = numofsamples;
 
     return;
