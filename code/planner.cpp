@@ -3,7 +3,7 @@
  * planner.c
  *
  *=================================================================*/
-// #include "planner.h"
+#include "planner.h"
 #include "MyRRT.h"
 #include "RRT_Connect.h"
 
@@ -15,11 +15,12 @@ static void planner(
         double* armgoal_anglesV_rad,
 	    int numofDOFs,
 	    double*** plan,
-	    int* planlength)
+	    int* planlength,
+        int planner_id)
 {
 	  //no plan by default
-	  *plan = NULL;
-	  *planlength = 0;
+	*plan = NULL;
+	*planlength = 0;
     
     /*
     //for now just do straight interpolation between start and goal checking for the validity of samples
@@ -56,23 +57,28 @@ static void planner(
         start[i] = armstart_anglesV_rad[i];
         goal[i] = armgoal_anglesV_rad[i];
     }
-
-    /*
-    MyRRT myRRT (numofDOFs, start, goal, map, x_size, y_size);      // Initialize a RRT.
-    myRRT.set_epsilon(0.2);                                         // Set the epsilon.
-    myRRT.set_threshold(0.001);                                     // Set the threshold.
-    myRRT.set_maxnum(1000000);                                      // Set maximum number of nodes in RRT.
-    int numofsamples = 0;                                           // Initialize number of samples.
-    myRRT.planning(plan, numofsamples);                             // Start planning.
-    *planlength = numofsamples;
-    // cout << "Number of samples: " << numofsamples << endl;
-    */
-    double epsilon = 0.2;
-    RRT_Connect myRRTConnect (numofDOFs, start, goal, map, x_size, y_size, epsilon);
-    myRRTConnect.set_maxnum(1000000);
-    int numofsamples = 0;
-    myRRTConnect.planning(plan, numofsamples);
-    *planlength = numofsamples;
+    
+    
+    if (planner_id == RRT){
+        // Using RRT to plan the path.
+        MyRRT myRRT (numofDOFs, start, goal, map, x_size, y_size);      // Initialize a RRT.
+        myRRT.set_epsilon(0.2);                                         // Set the epsilon.
+        myRRT.set_threshold(0.001);                                     // Set the threshold.
+        myRRT.set_maxnum(100000);                                      // Set maximum number of nodes in RRT.
+        int numofsamples = 0;                                           // Initialize number of samples.
+        myRRT.planning(plan, numofsamples);                             // Start planning.
+        *planlength = numofsamples;
+    }
+    else if (planner_id == RRTCONNECT){
+        // Using RRT Connect to plan the path.
+        double epsilon = 0.2;
+        RRT_Connect myRRTConnect (numofDOFs, start, goal, map, x_size, y_size, epsilon);
+        myRRTConnect.set_maxnum(100000);
+        int numofsamples = 0;
+        myRRTConnect.planning(plan, numofsamples);
+        *planlength = numofsamples;
+    }
+    
     
     return;
 }
@@ -135,7 +141,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
     //}
     
     //dummy planner which only computes interpolated path
-    planner(map,x_size,y_size, armstart_anglesV_rad, armgoal_anglesV_rad, numofDOFs, &plan, &planlength); 
+    planner(map,x_size,y_size, armstart_anglesV_rad, armgoal_anglesV_rad, numofDOFs, &plan, &planlength, planner_id); 
     
     printf("planner returned plan of length=%d\n", planlength); 
     
